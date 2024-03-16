@@ -1,8 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import hallBookingRoutes from './routes/hallBookingRoutes.js';
+import connectDB from './config/db.js';
 
 dotenv.config();
+
+connectDB();
 
 const app = express();
 
