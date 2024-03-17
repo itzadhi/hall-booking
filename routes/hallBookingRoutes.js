@@ -3,19 +3,25 @@ import {
   createRoom,
   bookARoom,
   getAllBooking,
+  getAllCustomerDetails,
+  getCustomerDetails,
 } from '../controllers/hallBookingController.js';
 
 const router = express.Router();
 
+// @desc    Create a room
 router.route('/create').post(createRoom);
 
+// @desc    Book a room
 router.route('/booking').post(bookARoom);
 
-router.route('/details').get(getAllBooking);
+// @desc    Get all booking details
+router.route('/booking/details').get(getAllBooking);
 
-// router
-//   .route('/customers').get();
+// @desc    Get all customer details
+router.route('/booking/customers').get(getAllCustomerDetails);
 
-// router.route('/')
+// @desc    Get all customer details with their booking history
+router.route('/booking/customer/details').get(getCustomerDetails);
 
 export default router;

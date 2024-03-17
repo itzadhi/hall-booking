@@ -7,7 +7,15 @@ const bookingSchema = mongoose.Schema(
       required: true,
       ref: 'Room',
     },
-    bookingDate: {
+    roomName: {
+      type: String,
+      required: true,
+    },
+    bookingFromDate: {
+      type: String,
+      required: true,
+    },
+    bookingToDate: {
       type: String,
       required: true,
     },
@@ -20,6 +28,10 @@ const bookingSchema = mongoose.Schema(
       required: true,
     },
     customerName: {
+      type: String,
+      required: true,
+    },
+    status: {
       type: String,
       required: true,
     },
