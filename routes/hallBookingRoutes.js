@@ -22,6 +22,6 @@ router.route('/booking/details').get(getAllBooking);
 router.route('/booking/customers').get(getAllCustomerDetails);
 
 // @desc    Get all customer details with their booking history
-router.route('/booking/customer/details').get(getCustomerDetails);
+router.route('/booking/customer/:name').get(getCustomerDetails);
 
 export default router;

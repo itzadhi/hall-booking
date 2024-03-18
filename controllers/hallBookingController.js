@@ -77,14 +77,34 @@ const getAllCustomerDetails = async (req, res) => {
   try {
     //Getting all customers from Booking Collection
     const getBookingData = await Booking.find({});
-    const responseData = getBookingData.map((data) => {
-      return {
-        customerName: data?.customerName,
-        roomName: data?.roomName,
-        bookingDate: data?.bookingFromDate,
-        startTime: data?.startTime,
-        endTime: data?.endTime,
-      };
+    const responseData = [];
+    getBookingData.forEach((customer) => {
+      const customerData = [];
+      //Checking not to fetch again same user details
+      const userDetailExists = responseData?.find(
+        (user) => user?.customerName === customer?.customerName
+      );
+      if (userDetailExists) {
+        return;
+      } else {
+        getBookingData.filter((item) => {
+          if (item?.customerName === customer?.customerName) {
+            customerData.push({
+              roomName: item?.roomName,
+              bookingFromDate: item?.bookingFromDate,
+              bookingToDate: item?.bookingToDate,
+              startTime: item?.startTime,
+              endTime: item?.endTime,
+            });
+            return item;
+          }
+        });
+
+        responseData.push({
+          customerName: customer?.customerName,
+          bookingDetails: customerData,
+        });
+      }
     });
     res.status(200).send(responseData);
   } catch (error) {
@@ -93,43 +113,37 @@ const getAllCustomerDetails = async (req, res) => {
 };
 
 // @desc    Get all customer details with their booking history
-// @route   GET /room/customer/details
+// @route   GET /room/customer/:name
 // @access  Public
 const getCustomerDetails = async (req, res) => {
   try {
-    const getBookingData = await Booking.find({});
-    const responseData = [];
-    getBookingData.forEach((customer) => {
-      const customerData = [];
-      const userExists = responseData?.find(
-        (user) => user?.customerName === customer?.customerName
-      );
-      if (userExists) {
-        return;
-      } else {
-        getBookingData.filter((item) => {
-          if (item?.customerName === customer?.customerName) {
-            customerData.push({
-              roomName: item?.roomName,
-              bookingId: item?._id,
-              bookingFromDate: item?.bookingFromDate,
-              bookingToDate: item?.bookingToDate,
-              startTime: item?.startTime,
-              endTime: item?.endTime,
-              status: item?.status,
-            });
-            return item;
-          }
-        });
+    const { name } = req.params;
+    const getBookingData = await Booking.find({ customerName: name });
+    if (getBookingData?.length === 0) {
+      res.status(404);
+      throw new Error('The user has no booking details');
+    }
+    const responseData = getBookingData.map((customer) => {
+      const customerData = {
+        roomName: customer?.roomName,
+        bookingId: customer?._id,
+        bookingFromDate: customer?.bookingFromDate,
+        bookingToDate: customer?.bookingToDate,
+        startTime: customer?.startTime,
+        endTime: customer?.endTime,
+        status: customer?.status,
+      };
 
-        responseData.push({
-          customerName: customer?.customerName,
-          bookingCount: customerData?.length,
-          bookingDetails: customerData,
-        });
-      }
+      return customerData;
     });
-    res.status(200).send(responseData);
+    const customerDeatils = [
+      {
+        customerName: name,
+        bookingCount: getBookingData?.length,
+        bookingDetails: responseData,
+      },
+    ];
+    res.status(200).send(customerDeatils);
   } catch (error) {
     res.status(500).send(error?.message);
   }
