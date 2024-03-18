@@ -32,14 +32,15 @@ const bookARoom = async (req, res) => {
       throw new Error('Please enter the correct room name');
     }
 
-    const roomsAvailability = await Booking.findOne({
+    const roomsAvailability = await Booking.find({
       roomId: getRoomId?._id,
     });
-
     //To check whether the selected room is available with our booking data
-    if (roomsAvailability) {
+    if (roomsAvailability?.length > 0) {
+      const lastBookedRoomData =
+        roomsAvailability?.[roomsAvailability?.length - 1];
       const bookedEndTime = new Date(
-        roomsAvailability?.bookingToDate + ' ' + roomsAvailability?.endTime
+        lastBookedRoomData?.bookingToDate + ' ' + lastBookedRoomData?.endTime
       );
       if (bookingStartTime <= bookedEndTime) {
         res.status(409);
@@ -48,7 +49,6 @@ const bookARoom = async (req, res) => {
         );
       }
     }
-
     const reqBody = { roomId: getRoomId?._id, ...body };
     await Booking.collection.insertOne(reqBody);
     res.status(201).send(reqBody);
