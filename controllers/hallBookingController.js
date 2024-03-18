@@ -101,25 +101,33 @@ const getCustomerDetails = async (req, res) => {
     const responseData = [];
     getBookingData.forEach((customer) => {
       const customerData = [];
-      getBookingData.filter((item) => {
-        if (item?.customerName === customer?.customerName) {
-          customerData.push({
-            roomName: item?.roomName,
-            bookingId: item?._id,
-            bookingFromDate: item?.bookingFromDate,
-            bookingToDate: item?.bookingToDate,
-            startTime: item?.startTime,
-            endTime: item?.endTime,
-            status: item?.status,
-          });
-          return item;
-        }
-      });
-      responseData.push({
-        customerName: customer?.customerName,
-        bookingCount: customerData?.length,
-        bookingDetails: customerData,
-      });
+      const userExists = responseData?.find(
+        (user) => user?.customerName === customer?.customerName
+      );
+      if (userExists) {
+        return;
+      } else {
+        getBookingData.filter((item) => {
+          if (item?.customerName === customer?.customerName) {
+            customerData.push({
+              roomName: item?.roomName,
+              bookingId: item?._id,
+              bookingFromDate: item?.bookingFromDate,
+              bookingToDate: item?.bookingToDate,
+              startTime: item?.startTime,
+              endTime: item?.endTime,
+              status: item?.status,
+            });
+            return item;
+          }
+        });
+
+        responseData.push({
+          customerName: customer?.customerName,
+          bookingCount: customerData?.length,
+          bookingDetails: customerData,
+        });
+      }
     });
     res.status(200).send(responseData);
   } catch (error) {
